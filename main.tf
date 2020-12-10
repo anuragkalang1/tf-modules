@@ -32,6 +32,22 @@ resource "aws_security_group" "test1" {
   }
 }
 
+resource "aws_lb" "test" {
+  name               = "helloworld-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [test1.id]
+  subnets            = aws_subnet.public.*.id
+
+  enable_deletion_protection = true
+
+  access_logs {
+    bucket  = helloworld.lb_logs.bucket
+    prefix  = "helloworld-lb"
+    enabled = true
+  }
+}
+
 resource "aws_launch_configuration" "hello_world_deploy" {
   name_prefix                   = "Helloworld-"
   image_id                      = "${var.ami}"
